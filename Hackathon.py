@@ -14,11 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 GROQ_API_KEY = os.getenv(GROQ_API_KEY)
-
-# --------- 🔐 Setup Groq Client ----------
 client = Groq(api_key=GROQ_API_KEY)
-
-# --------- 📁 Session Memory Functions ----------
 def remember_context(text):
     with open("context_memory.txt", "a") as file:
         file.write(text + "\n")
@@ -29,7 +25,6 @@ def load_context():
     with open("context_memory.txt", "r") as file:
         return file.read().strip()
 
-# --------- 🗣️ Speak Text ----------
 async def speak_async(text, voice="en-US-JennyNeural"):
     print(f"\nMentor: {text}\n")
     communicate = edge_tts.Communicate(text, voice)
@@ -40,7 +35,6 @@ async def speak_async(text, voice="en-US-JennyNeural"):
 def speak(text):
     asyncio.run(speak_async(text))
 
-# --------- 🎤 Listen ----------
 def listen():
     recognizer = sr.Recognizer()
     full_command = ""
@@ -56,7 +50,6 @@ def listen():
                 print(f"You: {command}")
                 full_command += " " + command.lower()
 
-                # Stop listening if user says a stop phrase
                 if any(stop_phrase in command.lower() for stop_phrase in ["that's it", "okay done", "that's all"]):
                     break
 
@@ -72,7 +65,6 @@ def listen():
 
     return full_command.strip()
 
-# --------- 💬 Ask Groq (LLaMA 3) ----------
 def ask_groq(prompt):
     try:
         chat = client.chat.completions.create(
@@ -94,7 +86,6 @@ def ask_groq(prompt):
     except Exception as e:
         return f"Sorry, I couldn't generate a response. ({e})"
 
-# --------- 👋 Greeting ----------
 def greet():
     hour = int(datetime.datetime.now().hour)
     if 5 <= hour < 12:
@@ -104,7 +95,6 @@ def greet():
     else:
         speak("Hi , How are you, How can i help you")
 
-# --------- 🔁 Main Loop ----------
 def main():
     greet()
     while True:
@@ -112,7 +102,6 @@ def main():
         if not command:
             continue
 
-        # Utilities
         if "time" in command:
             now = datetime.datetime.now().strftime("%I:%M %p")
             speak(f"The time is {now}")
@@ -148,11 +137,9 @@ def main():
             speak("Goodbye! and don't disturb me again ")
             break
 
-        # Hackathon Context Storage
         if any(word in command for word in ["idea", "project", "app", "build", "develop", "hackathon"]):
             remember_context(command)
 
-        # Load memory and use your chosen prompt
         context = load_context()
         prompt = (
             "Keep your respose short and sweet, keep 2 to 3 snetences "
